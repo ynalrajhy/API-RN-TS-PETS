@@ -1,8 +1,10 @@
+import { GetAllPets } from "@/api/pet";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
   ScrollView,
   StyleSheet,
+  Button,
   Text,
   TouchableOpacity,
   View,
@@ -25,6 +27,11 @@ export default function Index() {
     setPets([newPet, ...pets]);
   };
 
+  const getAllPets = async () => {
+    const response = await GetAllPets();
+    setPets(response);
+  };
+
   return (
     <>
       <TouchableOpacity
@@ -32,6 +39,12 @@ export default function Index() {
         style={styles.headerButton}
       >
         <Text style={styles.headerButtonText}>Add Pet</Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        onPress={() => getAllPets()}
+        style={styles.headerButton}
+      >
+        <Text style={styles.headerButtonText}>Get All Pets</Text>
       </TouchableOpacity>
 
       <SafeAreaView style={styles.container} edges={["bottom"]}>
