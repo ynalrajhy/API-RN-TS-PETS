@@ -1,10 +1,10 @@
 import { GetAllPets } from "@/api/pet";
+import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
   ScrollView,
   StyleSheet,
-  Button,
   Text,
   TouchableOpacity,
   View,
@@ -32,6 +32,13 @@ export default function Index() {
     setPets(response);
   };
 
+  const { data, isPending, refetch } = useQuery({
+    queryKey: ["AllPets"],
+    queryFn: GetAllPets,
+  });
+  
+  console.log(data);
+
   return (
     <>
       <TouchableOpacity
@@ -49,13 +56,17 @@ export default function Index() {
 
       <SafeAreaView style={styles.container} edges={["bottom"]}>
         <ScrollView contentContainerStyle={styles.scrollContent}>
-          {pets.length === 0 ? (
+          {isPending ? (
+            <View style={styles.loadingContainer}>
+              <Text style={styles.loadingText}>Loading...</Text>
+            </View>
+          ) : pets.length === 0 ? (
             <View style={styles.emptyContainer}>
               <Text style={styles.emptyText}>No pets yet!</Text>
               <Text style={styles.emptySubtext}>Start by adding a new pet</Text>
             </View>
           ) : (
-            pets.map((pet) => (
+            data?.map((pet: Pet) => (
               <PetCard
                 key={pet.id}
                 pet={pet}
@@ -68,6 +79,7 @@ export default function Index() {
           visible={modalVisible}
           onClose={() => setModalVisible(false)}
           onAdd={handleAddPet}
+          refetch={refetch}
         />
       </SafeAreaView>
     </>
@@ -112,5 +124,16 @@ const styles = StyleSheet.create({
     fontWeight: "300",
     marginTop: -2,
     textAlign: "center",
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingTop: 100,
+  },
+  loadingText: {
+    fontSize: 16,
+    color: "#666",
+    fontWeight: "500",
   },
 });
